@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nothing → Everything</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js"></script>
+
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  html, body {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .nothing {
+    flex: 1;
+    background: #f7f7f7;
+    color: #ccc;
+    display: grid;
+    place-items: center;
+    font-size: clamp(2rem, 7vw, 5rem);
+    font-weight: 200;
+    user-select: none;
+  }
+  .everything {
+    flex: 1;
+    background: #111;
+    color: #fff;
+    display: grid;
+    place-items: center;
+    font-size: clamp(2rem, 7vw, 5rem);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
+    user-select: none;
+  }
+  .everything:hover {
+    background: #222;
+  }
+
+  #formulaPage {
+    position: fixed;
+    inset: 0;
+    background: #fff;
+    transform: translateY(100%);
+    transition: transform 0.7s cubic-bezier(0.3, 1, 0.3, 1);
+    overflow-y: auto;
+    padding: 1.5rem 1rem;
+  }
+  #formulaPage.active {
+    transform: translateY(0);
+  }
+
+  .backBtn {
+    position: sticky;
+    top: 0;
+    background: #000;
+    color: #fff;
+    border: none;
+    padding: 0.8rem 1.4rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-bottom: 1.5rem;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 12px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .box {
+    height: 140px;
+    background: #f9f9f9;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    gap: 0.4rem;
+  }
+  .formula {
+    font-size: 1.1rem;
+    color: #000;
+    white-space: nowrap;
+  }
+  .info {
+    font-size: 0.75rem;
+    color: #666;
+    text-align: center;
+    line-height: 1.3;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <div class="nothing">Nothing</div>
+  <div class="everything" id="open">Everything</div>
+</div>
+
+<div id="formulaPage">
+  <button class="backBtn" id="back">← Back</button>
+  <div class="grid" id="grid"></div>
+</div>
+
+<script>
+  // 每条包含：公式、作者、年份、领域
+  const data = [
+    { tex: "E=mc^2", author: "爱因斯坦", year: "1905", field: "相对论" },
+    { tex: "F=ma", author: "牛顿", year: "1687", field: "经典力学" },
+    { tex: "a^2+b^2=c^2", author: "毕达哥拉斯", year: "公元前", field: "数学" },
+    { tex: "PV=nRT", author: "克拉伯龙", year: "1834", field: "热力学" },
+    { tex: "S=k\\ln W", author: "玻尔兹曼", year: "1872", field: "统计物理" },
+    { tex: "F=G\\frac{m_1m_2}{r^2}", author: "牛顿", year: "1687", field: "引力" },
+    { tex: "i\\hbar\\frac{\\partial}{\\partial t}\\Psi=\\hat{H}\\Psi", author: "薛定谔", year: "1926", field: "量子力学" },
+    { tex: "\\Delta x \\Delta p \\geq \\frac{\\hbar}{2}", author: "海森堡", year: "1927", field: "量子力学" },
+    { tex: "E=h\\nu", author: "爱因斯坦", year: "1905", field: "量子论" },
+    { tex: "c=\\lambda\\nu", author: "麦克斯韦", year: "1864", field: "电磁学" },
+    { tex: "F=qvB", author: "洛伦兹", year: "1895", field: "电磁学" },
+    { tex: "V=IR", author: "欧姆", year: "1827", field: "电路" },
+    { tex: "E=\\frac{1}{2}mv^2", author: "科里奥利", year: "1829", field: "力学" },
+    { tex: "F=qE", author: "库仑/法拉第", year: "18-19世纪", field: "电磁学" },
+    { tex: "p=\\rho gh", author: "帕斯卡", year: "1647", field: "流体力学" },
+    { tex: "\\nabla\\cdot\\mathbf{E}=\\rho/\\varepsilon_0", author: "麦克斯韦", year: "1864", field: "电磁学" },
+    { tex: "F=kx", author: "胡克", year: "1678", field: "弹性力学" },
+    { tex: "T=2\\pi\\sqrt{\\frac{L}{g}}", author: "惠更斯", year: "1673", field: "力学" }
+  ];
+
+  const grid = document.getElementById("grid");
+
+  function render() {
+    grid.innerHTML = "";
+    data.forEach(item => {
+      const box = document.createElement("div");
+      box.className = "box";
+      box.innerHTML = `
+        <div class="formula">${katex.renderToString(item.tex, {throwOnError:false})}</div>
+        <div class="info">${item.author} · ${item.year} · ${item.field}</div>
+      `;
+      grid.appendChild(box);
+    });
+  }
+
+  document.getElementById("open").onclick = () => {
+    document.getElementById("formulaPage").classList.add("active");
+    render();
+  };
+  document.getElementById("back").onclick = () => {
+    document.getElementById("formulaPage").classList.remove("active");
+  };
+</script>
+</body>
+</html>
