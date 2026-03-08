@@ -18,6 +18,8 @@
             color: #1d1d1f;
             min-height: 100vh;
             overflow-x: hidden;
+            position: relative; /* 为版权栏定位 */
+            padding-bottom: 60px; /* 给版权栏留空间 */
         }
 
         /* 主容器：左右分栏，高度100vh */
@@ -36,6 +38,8 @@
             align-items: flex-start; /* 取消默认居中，改为按高度定位 */
             justify-content: center;
             overflow: hidden;
+            cursor: pointer; /* 点击交互 */
+            transition: background-color 0.3s ease; /* 平滑过渡 */
         }
 
         .left-column h1 {
@@ -56,6 +60,7 @@
             /* 强制不换行，宽度限制 */
             white-space: nowrap;
             max-width: 100%;
+            transition: color 0.3s ease; /* 文字颜色过渡 */
         }
 
         /* 右侧栏：与左侧对称 */
@@ -66,6 +71,8 @@
             align-items: flex-start;
             justify-content: center;
             overflow: hidden;
+            cursor: pointer; /* 点击交互 */
+            transition: background-color 0.3s ease; /* 平滑过渡 */
         }
 
         .right-column h1 {
@@ -85,6 +92,7 @@
             line-height: 1;
             white-space: nowrap;
             max-width: 100%;
+            transition: color 0.3s ease; /* 文字颜色过渡 */
         }
 
         /* 公式：放大+斜体+背景，精准定位到25%高度 */
@@ -94,6 +102,7 @@
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 10;
+            cursor: pointer; /* 点击交互 */
             
             /* 大幅放大公式：从7vw提升到10vw，最大从120px到180px */
             font-size: clamp(40px, 10vw, 180px);
@@ -111,6 +120,7 @@
             white-space: nowrap;
             /* 加轻微阴影，突出背景 */
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease; /* 交互过渡 */
         }
 
         /* 箭头：放大+斜体，精准定位到35%高度 */
@@ -138,13 +148,25 @@
             50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
         }
 
-        /* 悬停微动效 */
+        /* 悬停微动效（增强） */
         .left-column:hover {
             background-color: #e8e8ed;
+        }
+        .left-column:hover h1 {
+            color: #6e6e73; /* 悬停加深文字色 */
         }
 
         .right-column:hover {
             background-color: #141414;
+        }
+        .right-column:hover h1 {
+            color: #f5f5f7; /* 悬停提亮文字色 */
+        }
+
+        .physics-formula:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            color: #1d1d1f;
         }
 
         /* 移动端适配：保持定位比例，同步放大字体 */
@@ -168,23 +190,301 @@
                 max-width: 80%;
             }
         }
+
+        /* ========== 新增：二级页面弹窗样式 ========== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background-color: #ffffff;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 32px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            transform: translateY(20px) scale(0.98);
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: translateY(0) scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f5f5f7;
+        }
+
+        .modal-title {
+            font-size: 32px;
+            font-weight: 600;
+            color: #1d1d1f;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #86868b;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background-color: #f5f5f7;
+            color: #1d1d1f;
+        }
+
+        .modal-body {
+            font-size: 17px;
+            line-height: 1.6;
+            color: #424245;
+        }
+
+        .modal-body p {
+            margin-bottom: 16px;
+        }
+
+        .modal-body strong {
+            color: #1d1d1f;
+            font-weight: 600;
+        }
+
+        /* ========== 新增：版权声明样式 ========== */
+        .copyright-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background-color: #f5f5f7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 20px;
+            border-top: 1px solid #e8e8ed;
+            z-index: 50;
+        }
+
+        .copyright-text {
+            font-size: 14px;
+            color: #86868b;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .terms-link {
+            color: #0066cc;
+            text-decoration: none;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .terms-link:hover {
+            color: #0071e3; /* 苹果蓝 hover 色 */
+            text-decoration: underline;
+        }
+
+        /* 条款弹窗特殊样式 */
+        #termsModal .modal-title {
+            color: #0071e3;
+        }
+        
+        /* 强调禁止引用的文字样式 */
+        .copyright-text .forbid {
+            color: #ff3b30; /* 苹果红，突出警示 */
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <!-- 左侧栏：首字母大写 Nothing -->
-        <div class="left-column">
+        <div class="left-column" id="nothingColumn">
             <h1>Nothing</h1>
         </div>
         <!-- 右侧栏：首字母大写 Everything -->
-        <div class="right-column">
+        <div class="right-column" id="everythingColumn">
             <h1>Everything</h1>
         </div>
         
         <!-- 公式（25%高度） -->
-        <div class="physics-formula">E=mc²</div>
+        <div class="physics-formula" id="formulaElement">E=mc²</div>
         <!-- 箭头（35%高度） -->
         <div class="arrow">→</div>
     </div>
+
+    <!-- ========== 新增：Nothing 详情弹窗 ========== -->
+    <div class="modal-overlay" id="nothingModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Nothing</h2>
+                <button class="modal-close" data-modal="nothingModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p><strong>虚无的本质</strong>：并非空无一物，而是未被认知、未被激活的能量状态。</p>
+                <p>1905年爱因斯坦提出质能公式E=mc²时，这个公式仅存在于理论层面——如同“虚无”，真理已在眼前，但人类尚未学会解读。</p>
+                <p>当时的人类对能量的认知停留在煤炭、石油等化学能层面，原子核中蕴藏的巨大能量仍处于“虚无”状态，未被发掘、未被利用。</p>
+                <p>“Nothing”代表着可能性的起点，是一切尚未发生的状态，是知识边界外的未知。</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== 新增：E=mc² 详情弹窗 ========== -->
+    <div class="modal-overlay" id="formulaModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">E=mc²</h2>
+                <button class="modal-close" data-modal="formulaModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p><strong>质能等价公式</strong>（E=mc²）是爱因斯坦狭义相对论的核心结论，揭示了质量与能量的统一性。</p>
+                <p>• E（Energy）：能量，单位为焦耳(J)</p>
+                <p>• m（Mass）：质量，单位为千克(kg)</p>
+                <p>• c（Speed of light）：真空中的光速，约3×10⁸米/秒</p>
+                <p>这个公式证明了极小的质量可以转化为巨大的能量，是核能、核武器、核电站的理论基础。它既是连接“虚无”与“万物”的桥梁，也是人类认知从有限走向无限的关键。</p>
+                <p>从1945年第一颗原子弹爆炸，到核电站点亮城市，再到医疗领域的核技术应用，E=mc²始终是改变世界的核心力量。</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== 新增：Everything 详情弹窗 ========== -->
+    <div class="modal-overlay" id="everythingModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Everything</h2>
+                <button class="modal-close" data-modal="everythingModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p><strong>万物的可能性</strong>：是质能公式被认知、被应用后，人类所能触及的一切。</p>
+                <p>“Everything”包含了两面性：一面是清洁能源、医疗进步、星际探索的无限希望；另一面是核威慑、环境风险的现实挑战。</p>
+                <p>聚变能源的突破、质子治疗技术、核热推进航天……E=mc²正在将“万物”的边界不断拓展。人类站在选择的岔路口，如何使用这份力量，决定了“万物”的最终形态。</p>
+                <p>从“虚无”到“万物”，中间只隔着人类对知识的理解与对力量的选择。</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== 新增：使用条款弹窗 ========== -->
+    <div class="modal-overlay" id="termsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">使用条款与版权声明</h2>
+                <button class="modal-close" data-modal="termsModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p><strong>版权所有 © 2026</strong> | <span class="forbid">严禁任何形式的创意引用、内容转载、设计模仿</span></p>
+                <p>本网页的所有内容（包括但不限于视觉设计、创意构思、文字内容、代码实现）均受《中华人民共和国著作权法》及相关国际公约严格保护。</p>
+                <p>1. <strong>禁止条款</strong>：严禁以任何目的（商业/非商业）引用、借鉴、复制、传播本网页的创意构思、视觉风格、内容逻辑；严禁将本网页内容用于任何形式的展示、分享、二次创作。</p>
+                <p>2. <strong>授权申请</strong>：如需使用本网页的创意构思或相关内容，必须提前通过邮箱 <strong>uilovechina@gmail.com</strong> 取得版权方的书面授权。</p>
+                <p>3. <strong>侵权追责</strong>：未经授权的引用、模仿行为，版权方将依法追究其法律责任（包括但不限于要求删除内容、赔偿经济损失）。</p>
+                <p>4. <strong>联系方式</strong>：版权授权及相关咨询请发送邮件至：<strong>uilovechina@gmail.com</strong></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== 新增：底部版权栏（强化禁止引用声明） ========== -->
+    <div class="copyright-bar">
+        <div class="copyright-text">
+            © 2025 All Rights Reserved | 
+            <span class="forbid">禁止引用创意</span> | 
+            授权咨询：uilovechina@gmail.com |
+            <span class="terms-link" id="termsLink">完整条款</span>
+        </div>
+    </div>
+
+    <script>
+        // 弹窗控制函数
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden'; // 禁止背景滚动
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.remove('active');
+            document.body.style.overflow = ''; // 恢复滚动
+        }
+
+        // 绑定点击事件
+        // Nothing 点击
+        document.getElementById('nothingColumn').addEventListener('click', () => {
+            openModal('nothingModal');
+        });
+
+        // E=mc² 点击
+        document.getElementById('formulaElement').addEventListener('click', () => {
+            openModal('formulaModal');
+        });
+
+        // Everything 点击
+        document.getElementById('everythingColumn').addEventListener('click', () => {
+            openModal('everythingModal');
+        });
+
+        // 使用条款 点击
+        document.getElementById('termsLink').addEventListener('click', () => {
+            openModal('termsModal');
+        });
+
+        // 关闭按钮点击
+        document.querySelectorAll('.modal-close').forEach(button => {
+            button.addEventListener('click', () => {
+                const modalId = button.getAttribute('data-modal');
+                closeModal(modalId);
+            });
+        });
+
+        // 点击弹窗外部关闭
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    const modalId = overlay.id;
+                    closeModal(modalId);
+                }
+            });
+        });
+
+        // ESC键关闭弹窗
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal-overlay.active').forEach(modal => {
+                    modal.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
+            }
+        });
+    </script>
 </body>
 </html>
